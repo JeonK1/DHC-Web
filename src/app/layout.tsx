@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MBTI 검사",
-  description: "나의 MBTI를 알아보세요",
+  title: "내 썸녀와 잘될 수 있을까?",
+  description: "두 사람의 운명적인 궁합을 확인해보세요",
 };
 
 export default function RootLayout({
