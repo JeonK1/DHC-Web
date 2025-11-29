@@ -1,82 +1,74 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { colors, gradients } from "@/design-system/foundations/colors";
-import { typography } from "@/design-system/foundations/typography";
 import { Header } from "@/design-system/components/Header/Header";
-import { CTAButton } from "@/design-system/components/Button/CTAButton";
+import { ScoreText } from "@/design-system/components/ScoreText";
+import { MoreBtn } from "@/design-system/components/MoreBtn";
+import { CTAButtonGroup } from "@/design-system/components/CTAButtonGroup";
+import { colors } from "@/design-system/foundations/colors";
 
 export default function Home() {
   const router = useRouter();
-
-  const handleStart = () => {
-    router.push("/test/question/1");
-  };
-
   return (
-    <div style={{ backgroundColor: colors.background.main, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <main
+      className="flex min-h-screen flex-col items-center p-6"
+      style={{ backgroundColor: colors.background.main }}
+    >
       <Header
-        type="title"
+        type="screenInfo"
         title="그녀와 나의 궁합은?!"
-        onBackClick={() => router.back()}
+        currentPage={1}
+        totalPage={4}
+        showBackButton={false}
+        showIndicator={false}
+        className="fixed top-0 left-0 right-0 z-50"
       />
-      <main className="flex flex-1 flex-col items-center justify-center p-6">
-        <div className="text-center max-w-md">
-          <div className="mb-6">
-            <span className="text-6xl mb-4 inline-block">💕</span>
-          </div>
-          <h1 style={{
-            ...typography.title.h1,
-            background: gradients.textGradient02,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            marginBottom: '16px',
-          }}>
-            그녀와 나의 궁합은?!
-          </h1>
-          <p style={{
-            ...typography.body.body3,
-            color: colors.neutral[300],
-            marginBottom: '32px',
-          }}>
-            그녀의 생일을 입력하고<br />
-            나와의 궁합을 쉽게 확인해보세요!
-          </p>
-        </div>
-      </main>
 
-      {/* 하단 고정 버튼 영역 */}
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        padding: '20px',
-        backgroundColor: colors.background.main,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px',
-      }}>
-        <CTAButton
-          buttonType="primary"
-          status="active"
-          size="xl"
-          fullWidth
-          onClick={handleStart}
-        >
-          테스트 시작하기
-        </CTAButton>
-        <CTAButton
-          buttonType="tertiary"
-          status="active"
-          size="xl"
-          fullWidth
-          onClick={() => console.log('공유하기 clicked')}
-        >
-          공유하기
-        </CTAButton>
+      {/* Header 높이(52px) + 40px 공백 */}
+      <div style={{ height: '92px' }} />
+
+      {/* 임시 그래픽 영역 */}
+      <div
+        className="w-full flex items-center justify-center -mx-6"
+        style={{
+          height: '188px',
+          backgroundColor: colors.violet[50],
+          width: 'calc(100% + 48px)',
+        }}
+      >
+        <span style={{ color: colors.neutral[500] }}>그래픽 (변경예정)</span>
       </div>
-    </div>
+
+      {/* 20px 공백 */}
+      <div style={{ height: '20px' }} />
+
+      {/* ScoreText */}
+      <ScoreText
+        type="result"
+        badgeText="짝사랑 하는 그녀... 나와 잘될 수 있을까?"
+        title="그녀와 나의 궁합은?!"
+        description={"그녀의 생일을 입력하고\n나와의 궁합을 쉽게 확인해보세요!"}
+      />
+
+      {/* 하단 고정 영역 */}
+      <div className="fixed bottom-0 left-0 right-0 flex flex-col items-center">
+        {/* 참여 인원 표시 */}
+        <div style={{ marginBottom: '12px', pointerEvents: 'none' }}>
+          <MoreBtn showIcon={false}>
+            지금까지 <span style={{ color: '#D8DCE2' }}>389</span>명이 참여했어요
+          </MoreBtn>
+        </div>
+
+        {/* CTA 버튼 그룹 */}
+        <CTAButtonGroup
+          type="twoButton"
+          primaryButtonText="테스트 시작하기"
+          onPrimaryClick={() => router.push('/test/question/1')}
+          tertiaryButtonText="공유하기"
+          onTertiaryClick={() => {}}
+        />
+      </div>
+
+    </main>
   );
 }

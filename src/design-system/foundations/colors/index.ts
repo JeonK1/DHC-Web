@@ -55,7 +55,7 @@ export const gradients = {
   /**
    * Text Gradient 01
    * - Type: Linear
-   * - Angle: 90deg
+   * - Angle: 180deg
    * - Colors: #B5BAEB → #F4F4F5
    * - Stops: 16%, 83%
    */
@@ -64,7 +64,7 @@ export const gradients = {
   /**
    * Text Gradient 02
    * - Type: Linear
-   * - Angle: 90deg
+   * - Angle: 180deg
    * - Colors: #B5BAEB → #F4F4F5
    * - Stops: 16%, 100%
    */
