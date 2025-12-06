@@ -1,14 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ScoreText } from "@/design-system/components/ScoreText";
 import { MessageCard } from "@/design-system/components/MessageCard";
 import { CTAButtonGroup } from "@/design-system/components/CTAButtonGroup";
+import { Modal } from "@/design-system/components/Modal";
 import { colors, gradients } from "@/design-system/foundations/colors";
 import { typography } from "@/design-system/foundations/typography";
 
-export function ResultPreview() {
+interface ResultPreviewProps {
+  onShare?: () => void;
+}
+
+export function ResultPreview({ onShare }: ResultPreviewProps) {
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 임시 궁합 점수 (나중에 실제 계산 로직으로 대체)
   const compatibilityScore = 85;
@@ -23,6 +30,19 @@ export function ResultPreview() {
 
   const handleRestart = () => {
     router.push("/");
+  };
+
+  const handleShareClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleShareConfirm = () => {
+    setIsModalOpen(false);
+    onShare?.();
   };
 
   return (
@@ -170,6 +190,7 @@ export function ResultPreview() {
               자세한 꿀팁{'\n'}무료로 확인해보세요!
             </p>
             <button
+              onClick={handleShareClick}
               style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -257,6 +278,45 @@ export function ResultPreview() {
           />
         </div>
       </div>
+
+      {/* 공유 모달 */}
+      {isModalOpen && (
+        <Modal
+          showOverlay
+          onOverlayClick={handleModalClose}
+          onClose={handleModalClose}
+          showBorder
+          badgeText="테스트 완료"
+          titleNode={
+            <>
+              <span
+                style={{
+                  ...typography.title.h4,
+                  background: gradients.textGradient01,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  textAlign: 'center',
+                }}
+              >
+                테스트 공유하고
+              </span>
+              <span
+                style={{
+                  ...typography.title.h4,
+                  color: colors.neutral[30],
+                  textAlign: 'center',
+                }}
+              >
+                자세한 내용 확인해보세요!
+              </span>
+            </>
+          }
+          graphicHeight={138}
+          buttonText="테스트 공유하기"
+          onButtonClick={handleShareConfirm}
+        />
+      )}
     </div>
   );
 }
