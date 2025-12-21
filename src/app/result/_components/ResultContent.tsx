@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CTAButtonGroup } from "@/design-system/components/CTAButtonGroup";
 import { ScoreText } from "@/design-system/components/ScoreText";
@@ -8,18 +8,64 @@ import { MessageCard } from "@/design-system/components/MessageCard";
 import { TipCard } from "@/design-system/components/TipCard";
 import { Title } from "@/design-system/components/Title";
 import { InputFieldGroup } from "@/design-system/components/InputFieldGroup";
+import { Modal } from "@/design-system/components/Modal";
 import { colors, gradients } from "@/design-system/foundations/colors";
 import { typography } from "@/design-system/foundations/typography";
 import { useTestStore } from "@/store/useTestStore";
 import { openStore } from "@/utils/storeUrl";
+import { shareUrl } from "@/utils/share";
+import { isMobileDevice } from "@/utils/device";
+import { showToast } from "@/utils/bridge";
 
 export function ResultContent() {
   const router = useRouter();
-  const { partnerInfo, userInfo } = useTestStore();
+  const { partnerInfo, userInfo, setHasShared } = useTestStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setIsMobile(isMobileDevice());
   }, []);
+
+  // 2초 후 모달 자동 열기 (모바일에서만)
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const timer = setTimeout(() => {
+      setIsModalOpen(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [isMobile]);
+
+  // 모달이 열려있을 때 스크롤 방지
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isModalOpen]);
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleShareConfirm = async () => {
+    setIsModalOpen(false);
+    const result = await shareUrl();
+    if (result.success && result.method === 'clipboard') {
+      alert('링크가 클립보드에 복사되었습니다!');
+    }
+    if (result.success) {
+      setHasShared(true);
+    }
+  };
 
   // 상대방 이름 (없으면 빈 문자열)
   const partnerName = partnerInfo.name || '';
@@ -272,13 +318,54 @@ export function ResultContent() {
         {/* CTA 버튼 영역 */}
         <CTAButtonGroup
           type="twoButton"
-          primaryButtonText="앱 설치하고 맞춤 미션 확인하기"
-          secondButtonText="테스트 다시하기"
-          secondButtonType="secondary"
-          onPrimaryClick={openStore}
-          onSecondButtonClick={handleRestart}
+          primaryButtonText={isMobile ? "공유하고 러브미션 받기" : "앱 설치하고 맞춤 미션 확인하기"}
+          secondButtonText={isMobile ? "메인화면으로 돌아가기" : "테스트 다시하기"}
+          secondButtonType={isMobile ? "tertiary" : "secondary"}
+          onPrimaryClick={isMobile ? handleShareConfirm : openStore}
+          onSecondButtonClick={isMobile ? () => showToast("hello world2") : handleRestart}
         />
       </div>
+
+      {/* 공유 모달 */}
+      {isModalOpen && (
+        <Modal
+          showOverlay
+          onOverlayClick={handleModalClose}
+          onClose={handleModalClose}
+          showBorder
+          badgeText="테스트 완료"
+          titleNode={
+            <>
+              <span
+                style={{
+                  ...typography.title.h4,
+                  background: gradients.textGradient01,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  textAlign: 'center',
+                }}
+              >
+                테스트 공유하고
+              </span>
+              <span
+                style={{
+                  ...typography.title.h4,
+                  color: colors.neutral[30],
+                  textAlign: 'center',
+                }}
+              >
+                자세한 내용 확인해보세요!
+              </span>
+            </>
+          }
+          graphicHeight={138}
+          buttonText="테스트 공유하기"
+          onButtonClick={handleShareConfirm}
+          secondButtonText="테스트 결과 확인하기"
+          onSecondButtonClick={handleModalClose}
+        />
+      )}
     </main>
   );
 }
