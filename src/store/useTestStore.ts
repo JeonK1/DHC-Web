@@ -27,6 +27,7 @@ interface PartnerBirth {
   year: string;
   month: string;
   day: string;
+  unknownBirth: boolean;
   unknownTime: boolean;
   birthTime: string;
   hairColor: string;
@@ -90,6 +91,7 @@ const initialState = {
     year: '',
     month: '',
     day: '',
+    unknownBirth: false,
     unknownTime: false,
     birthTime: '',
     hairColor: '',

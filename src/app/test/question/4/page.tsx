@@ -15,7 +15,9 @@ export default function Question4() {
   const router = useRouter();
   const { partnerBirth, setPartnerBirth } = useTestStore();
 
-  const isFormValid = partnerBirth.year && partnerBirth.month && partnerBirth.day && (partnerBirth.unknownTime || partnerBirth.birthTime) && partnerBirth.hairColor && partnerBirth.eyeColor && partnerBirth.skinColor;
+  const isBirthValid = partnerBirth.unknownBirth || (partnerBirth.year && partnerBirth.month && partnerBirth.day);
+  const isTimeValid = partnerBirth.unknownTime || partnerBirth.birthTime;
+  const isFormValid = isBirthValid && isTimeValid && partnerBirth.hairColor && partnerBirth.eyeColor && partnerBirth.skinColor;
 
   const handleNext = () => {
     if (isFormValid) {
@@ -82,16 +84,27 @@ export default function Question4() {
           description={`생년월일이 정확할수록\n더 적합한 정보를 제공해 드릴 수 있어요`}
         />
 
+        {/* 생년월일 체크 */}
+        <LabelButton
+          type="check"
+          size="sm"
+          label="생년월일"
+          checkLabel="잘 모르겠어요"
+          checked={partnerBirth.unknownBirth}
+          onCheck={(checked) => setPartnerBirth({ unknownBirth: checked })}
+        />
+
         {/* 생년월일 입력 */}
         <InputFieldGroup
           type="multi"
           size="md"
           label="생년월일"
           align="start"
+          showLabel={false}
           items={[
-            { key: 'year', value: partnerBirth.year, placeholder: '2000', suffix: '년', type: 'number', maxLength: 4 },
-            { key: 'month', value: partnerBirth.month, placeholder: '1', suffix: '월', type: 'number', maxLength: 2 },
-            { key: 'day', value: partnerBirth.day, placeholder: '1', suffix: '일', type: 'number', maxLength: 2 },
+            { key: 'year', value: partnerBirth.year, placeholder: '2000', suffix: '년', type: 'number', maxLength: 4, disabled: partnerBirth.unknownBirth },
+            { key: 'month', value: partnerBirth.month, placeholder: '1', suffix: '월', type: 'number', maxLength: 2, disabled: partnerBirth.unknownBirth },
+            { key: 'day', value: partnerBirth.day, placeholder: '1', suffix: '일', type: 'number', maxLength: 2, disabled: partnerBirth.unknownBirth },
           ]}
           onChange={(key, value) => {
             const { value: validatedValue } = validateDateField(key, value);
@@ -129,7 +142,7 @@ export default function Question4() {
         <Title
           type="page"
           size="sm"
-          title={`생일을 몰라도 괜찮아요\n아래의 정보로 운을 점쳐드릴게요!`}
+          title={`생일을 몰라도 괜찮아요. 그 사람의\n다른 정보를 토대로 운을 점쳐드릴게요!`}
         />
 
         {/* 머리색상 선택 */}

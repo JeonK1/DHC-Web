@@ -174,7 +174,7 @@ export const InputFieldGroup: React.FC<InputFieldGroupProps> = ({
               top: '50%',
               transform: 'translateY(-50%)',
               ...typography.body.body4,
-              color: item.value ? colors.violet[200] : colors.neutral[300],
+              color: item.disabled ? colors.neutral[300] : (item.value ? colors.violet[200] : colors.neutral[300]),
               pointerEvents: 'none',
             }}
           >

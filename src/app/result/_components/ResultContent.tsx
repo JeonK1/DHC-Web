@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CTAButtonGroup } from "@/design-system/components/CTAButtonGroup";
 import { ScoreText } from "@/design-system/components/ScoreText";
@@ -15,6 +16,10 @@ import { openStore } from "@/utils/storeUrl";
 export function ResultContent() {
   const router = useRouter();
   const { partnerInfo, userInfo } = useTestStore();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // 상대방 이름 (없으면 빈 문자열)
   const partnerName = partnerInfo.name || '';
