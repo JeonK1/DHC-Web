@@ -6,20 +6,14 @@
 @import url('https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background-main: #0F1114;
+  --text-main: #F4F4F5;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--text-main);
+  background-color: var(--background-main);
   font-family: 'Wanted Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
