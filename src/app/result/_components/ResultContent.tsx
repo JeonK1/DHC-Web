@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CTAButtonGroup } from "@/design-system/components/CTAButtonGroup";
 import { ScoreText } from "@/design-system/components/ScoreText";
@@ -8,6 +8,7 @@ import { MessageCard } from "@/design-system/components/MessageCard";
 import { TipCard } from "@/design-system/components/TipCard";
 import { Title } from "@/design-system/components/Title";
 import { InputFieldGroup } from "@/design-system/components/InputFieldGroup";
+import { InputField } from "@/design-system/components/InputField";
 import { Modal } from "@/design-system/components/Modal";
 import { colors, gradients } from "@/design-system/foundations/colors";
 import { typography } from "@/design-system/foundations/typography";
@@ -16,12 +17,109 @@ import { openStore } from "@/utils/storeUrl";
 import { shareUrl } from "@/utils/share";
 import { isNativeApp } from "@/utils/device";
 import { close } from "@/utils/bridge";
+import { DangerZoneGraphic, DangerZoneGraphicProps } from "./DangerZoneGraphic";
+
+type Gender = 'male' | 'female';
+
+const namePool = ['이**', '김**', '최**', '박**', '임**', '정**', '장**', '강**'];
+
+function shuffle<T>(array: T[]): T[] {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+function randomInRange(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+type Position = { top?: string; bottom?: string; left?: string; right?: string };
+
+// 중앙(40-60%)을 피하고 서로 겹치지 않는 4개 위치 생성
+function generateRandomPositions(): Position[] {
+  const zones: Array<{ vertical: 'top' | 'bottom'; horizontal: 'left' | 'right' }> = shuffle([
+    { vertical: 'top', horizontal: 'left' },
+    { vertical: 'top', horizontal: 'right' },
+    { vertical: 'bottom', horizontal: 'left' },
+    { vertical: 'bottom', horizontal: 'right' },
+  ]);
+
+  return zones.map(zone => {
+    // 중앙(50%)에서 최소 30% 이상 떨어지도록 설정
+    // top/bottom: 5-20%, left/right: 3-20%
+    const vValue = `${randomInRange(5, 20)}%`;
+    const hValue = `${randomInRange(3, 20)}%`;
+
+    return {
+      [zone.vertical]: vValue,
+      [zone.horizontal]: hValue,
+    };
+  });
+}
+
+// 위치를 퍼센트 값(0-100)으로 변환
+function getPositionPercent(position: Position): { x: number; y: number } {
+  let x = 50, y = 50;
+
+  if (position.left) x = parseFloat(position.left);
+  if (position.right) x = 100 - parseFloat(position.right);
+  if (position.top) y = parseFloat(position.top);
+  if (position.bottom) y = 100 - parseFloat(position.bottom);
+
+  return { x, y };
+}
+
+// 중심(50%, 50%)에 가장 가까운 rival 찾기
+function getClosestRivalName(rivals: DangerZoneGraphicProps['rivals']): string {
+  let closestName = rivals[0].name;
+  let minDistance = Infinity;
+
+  rivals.forEach(rival => {
+    const pos = getPositionPercent(rival);
+    const distance = Math.sqrt(Math.pow(pos.x - 50, 2) + Math.pow(pos.y - 50, 2));
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestName = rival.name;
+    }
+  });
+
+  return closestName;
+}
+
+function getDangerZoneData(gender: Gender): DangerZoneGraphicProps {
+  const isMale = gender === 'male';
+  const rivalPrefix = isMale ? '/icons/icon-female-rival-' : '/icons/icon-male-rival-';
+  const names = shuffle(namePool).slice(0, 4);
+  const positions = generateRandomPositions();
+
+  return {
+    centerIcon: {
+      iconImage: isMale ? '/icons/icon-male-crush.png' : '/icons/icon-female-crush.png',
+      name: isMale ? '남자 짝사랑' : '여자 짝사랑',
+      padding: '20px',
+    },
+    rivals: [
+      { iconImage: `${rivalPrefix}1.png`, name: names[0], ...positions[0] },
+      { iconImage: `${rivalPrefix}2.png`, name: names[1], ...positions[1] },
+      { iconImage: `${rivalPrefix}3.png`, name: names[2], ...positions[2] },
+      { iconImage: `${rivalPrefix}4.png`, name: names[3], ...positions[3] },
+    ],
+  };
+}
 
 export function ResultContent() {
   const router = useRouter();
   const { partnerInfo, userInfo, setHasShared } = useTestStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isApp, setIsApp] = useState(false);
+
+  // 위험요소 데이터 캐싱 (리렌더링 시 랜덤값 유지)
+  const dangerZoneData = useMemo(
+    () => getDangerZoneData((partnerInfo.gender as Gender) || 'male'),
+    [partnerInfo.gender],
+  );
+  const closestRivalName = useMemo(
+    () => getClosestRivalName(dangerZoneData.rivals),
+    [dangerZoneData.rivals],
+  );
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -237,19 +335,86 @@ export function ResultContent() {
           </div>
         </div>
 
-        {/* 언제 고백할까? 섹션 */}
-        <h2
+        {/* 위험요소 섹션 */}
+        <div
           style={{
-            ...typography.title['h5-1'],
-            color: colors.text.main,
-            textAlign: 'left',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '20px 0px 16px 0px',
             width: '100%',
-            padding: '24px 20px 16px 20px',
-            margin: 0,
           }}
         >
-          언제 고백할까?
-        </h2>
+          <img src="/icons/icon-knife.svg" alt="" width={18} height={18} />
+          <span
+            style={{
+              ...typography.title['h5-1'],
+              color: colors.text.main,
+              textAlign: 'left',
+              flex: 1,
+            }}
+          >
+            위험요소
+          </span>
+        </div>
+        <DangerZoneGraphic {...dangerZoneData} />
+        <div
+          style={{
+            width: '100%',
+            padding: '16px 0px 20px 0px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#1F2127',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              width: '100%',
+              textAlign: 'left',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: 'Wanted Sans',
+                fontWeight: 600,
+                fontSize: '15px',
+                lineHeight: '1.45em',
+                color: '#D7E1EE',
+                whiteSpace: 'pre-line',
+                display: 'block',
+              }}
+            >
+              그의 마음 근처에 4명의 {partnerInfo.gender === 'male' ? '여자' : '남자'}가 있어요!{'\n'}
+              특히 <span style={{ color: colors.violet[200] }}>{closestRivalName}</span> 을 조심해야해요{'\n'}
+              지금이 아니면 {partnerInfo.gender === 'male' ? '그를' : '그녀를'} 놓칠 수도 있어요...
+            </span>
+          </div>
+        </div>
+
+        {/* 언제 고백할까? 섹션 */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '20px 0px 16px 0px',
+            width: '100%',
+          }}
+        >
+          <img src="/icons/icon-alarm-clock.svg" alt="" width={18} height={18} />
+          <span
+            style={{
+              ...typography.title['h5-1'],
+              color: colors.text.main,
+              textAlign: 'left',
+              flex: 1,
+            }}
+          >
+            언제 고백하면 좋을까?
+          </span>
+        </div>
         <InputFieldGroup
           type="multi"
           size="md"
@@ -264,6 +429,35 @@ export function ResultContent() {
           ]}
           onChange={() => {}}
         />
+
+        {/* 어디서 고백하면 좋을까? 섹션 */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '20px 0px 16px 0px',
+            width: '100%',
+          }}
+        >
+          <img src="/icons/icon-map-marker.svg" alt="" width={18} height={18} />
+          <span
+            style={{
+              ...typography.title['h5-1'],
+              color: colors.text.main,
+              textAlign: 'left',
+              flex: 1,
+            }}
+          >
+            어디서 고백하면 좋을까?
+          </span>
+        </div>
+        <div style={{ paddingBottom: '20px' }}>
+          <InputField
+            value="학교 근처 놀이터에서"
+          />
+        </div>
 
         {/* 프로모션 텍스트 */}
         <div style={{ marginBottom: '24px' }}>
