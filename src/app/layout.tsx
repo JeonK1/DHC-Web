@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     description: "현재 389명이 참여했어요!",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.png?v=2",
         width: 1200,
         height: 630,
         alt: "궁합 테스트",
