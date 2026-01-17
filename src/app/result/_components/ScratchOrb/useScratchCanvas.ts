@@ -9,6 +9,8 @@ interface UseScratchCanvasOptions {
   brushSize: number;
   completionThreshold: number;
   onComplete: () => void;
+  /** 스크래치 시작 시 콜백 */
+  onScratchStart?: () => void;
   onProgressChange?: (progress: number) => void;
   /** 마운트 후 입력을 무시할 시간 (ms) */
   initialDelay?: number;
@@ -22,6 +24,7 @@ export function useScratchCanvas({
   brushSize,
   completionThreshold,
   onComplete,
+  onScratchStart,
   onProgressChange,
   initialDelay = 150,
 }: UseScratchCanvasOptions) {
@@ -29,6 +32,7 @@ export function useScratchCanvas({
   const [progress, setProgress] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const hasCompleted = useRef(false);
+  const hasStarted = useRef(false);
   const rafId = useRef<number | undefined>(undefined);
   const currentProgress = useRef(0);
 
@@ -186,10 +190,14 @@ export function useScratchCanvas({
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       if (!isReady) return;
+      if (!hasStarted.current) {
+        hasStarted.current = true;
+        onScratchStart?.();
+      }
       setIsDrawing(true);
       scratch(e.clientX, e.clientY);
     },
-    [scratch, isReady],
+    [scratch, isReady, onScratchStart],
   );
 
   const handleMouseMove = useCallback(
@@ -209,11 +217,15 @@ export function useScratchCanvas({
     (e: React.TouchEvent<HTMLCanvasElement>) => {
       e.preventDefault();
       if (!isReady) return;
+      if (!hasStarted.current) {
+        hasStarted.current = true;
+        onScratchStart?.();
+      }
       setIsDrawing(true);
       const touch = e.touches[0];
       scratch(touch.clientX, touch.clientY);
     },
-    [scratch, isReady],
+    [scratch, isReady, onScratchStart],
   );
 
   const handleTouchMove = useCallback(

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { colors } from "@/design-system/foundations/colors";
 import { ScoreText } from "@/design-system/components/ScoreText";
+import { Tooltip } from "@/design-system/components/Tooltip";
 import { ScratchOrb } from "./ScratchOrb";
 import { isNativeApp } from "@/utils/device";
 
@@ -32,10 +33,15 @@ interface ResultReadyProps {
 
 export function ResultReady({ onConfirm }: ResultReadyProps) {
   const [isApp, setIsApp] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
 
   useEffect(() => {
     setIsApp(isNativeApp());
   }, []);
+
+  const handleScratchStart = () => {
+    setShowTooltip(false);
+  };
 
   return (
     <div style={{ position: 'relative', height: '100dvh' }}>
@@ -56,16 +62,46 @@ export function ResultReady({ onConfirm }: ResultReadyProps) {
           />
         </div>
 
-        {/* 원형 오브 - ScoreText 하단 (Tooltip 공간 포함) */}
+        {/* 원형 오브 - ScoreText 하단 */}
         <div
           style={{
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            marginTop: '87px',
+            gap: '16px',
+            marginTop: '24px',
           }}
         >
+          {/* Swipe 툴팁 */}
+          <div
+            className="tooltip-bounce"
+            style={{
+              visibility: showTooltip ? 'visible' : 'hidden',
+            }}
+          >
+            <Tooltip label="문질러 보세요!" arrowPosition="bottom-center" />
+          </div>
+          <style jsx>{`
+            .tooltip-bounce {
+              animation: tooltipBounce 1s ease-in-out infinite;
+            }
+            @keyframes tooltipBounce {
+              0% {
+                transform: translateY(0);
+              }
+              25% {
+                transform: translateY(-10px);
+              }
+              75% {
+                transform: translateY(10px);
+              }
+              100% {
+                transform: translateY(0);
+              }
+            }
+          `}</style>
+
           {/* Scratch Orb */}
           <ScratchOrb
             size={210}
@@ -74,6 +110,7 @@ export function ResultReady({ onConfirm }: ResultReadyProps) {
             revealText=""
             completionThreshold={0.65}
             brushSize={30}
+            onScratchStart={handleScratchStart}
             onComplete={onConfirm}
           />
         </div>

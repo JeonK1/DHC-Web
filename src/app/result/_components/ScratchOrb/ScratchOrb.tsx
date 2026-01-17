@@ -44,6 +44,10 @@ export interface ScratchOrbProps {
    */
   onComplete: () => void;
   /**
+   * 스크래치 시작 시 콜백 (선택)
+   */
+  onScratchStart?: () => void;
+  /**
    * 진행률 변경 콜백 (선택)
    */
   onProgressChange?: (progress: number) => void;
@@ -58,6 +62,7 @@ export function ScratchOrb({
   completionThreshold = 0.5,
   brushSize = 30,
   onComplete,
+  onScratchStart,
   onProgressChange,
 }: ScratchOrbProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -77,6 +82,7 @@ export function ScratchOrb({
     brushSize,
     completionThreshold,
     onComplete,
+    onScratchStart,
     onProgressChange,
   });
 
