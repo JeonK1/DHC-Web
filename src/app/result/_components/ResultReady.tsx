@@ -6,6 +6,26 @@ import { ScoreText } from "@/design-system/components/ScoreText";
 import { ScratchOrb } from "./ScratchOrb";
 import { isNativeApp } from "@/utils/device";
 
+// 점수에 따른 결과 이미지 경로 반환 (0~10: 1번, 11~20: 2번, ..., 91~100: 10번)
+function getResultImage(score: number): string {
+  const imageNumber = score <= 10 ? 1 : score >= 100 ? 10 : Math.floor(score / 10);
+
+  const images: Record<number, string> = {
+    1: 'result-image-1-knife',
+    2: 'result-image-2-deadkinght',
+    3: 'result-image-3-execution',
+    4: 'result-image-4-assassin',
+    5: 'result-image-5-priest2',
+    6: 'result-image-6-queen',
+    7: 'result-image-7-king',
+    8: 'result-image-8-priest',
+    9: 'result-image-9-angel',
+    10: 'result-image-10-wizard',
+  };
+
+  return `/images/${images[imageNumber]}.png`;
+}
+
 interface ResultReadyProps {
   onConfirm: () => void;
 }
@@ -36,23 +56,22 @@ export function ResultReady({ onConfirm }: ResultReadyProps) {
           />
         </div>
 
-        {/* 원형 오브 - 화면 중앙 */}
+        {/* 원형 오브 - ScoreText 하단 (Tooltip 공간 포함) */}
         <div
           style={{
-            flex: 1,
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center',
             alignItems: 'center',
-            gap: '16px',
+            marginTop: '87px',
           }}
         >
           {/* Scratch Orb */}
           <ScratchOrb
             size={210}
-            maskColor="#CDE3FF"
-            revealImageUrl="/images/scratch-reveal-orb.png"
+            maskImageUrl="/images/scratch-intro-orb.png"
+            revealImageUrl={getResultImage(85)}
+            revealText=""
             completionThreshold={0.65}
             brushSize={30}
             onComplete={onConfirm}
