@@ -127,7 +127,7 @@ interface CompatibilityScoreSectionProps {
 
 function CompatibilityScoreSection({ score }: CompatibilityScoreSectionProps) {
   return (
-    <div style={{ paddingTop: '26px', paddingBottom: '24px' }}>
+    <div style={{ paddingTop: '64px' }}>
       <ScoreText
         type="result"
         badgeText="궁합점수"
@@ -138,7 +138,33 @@ function CompatibilityScoreSection({ score }: CompatibilityScoreSectionProps) {
   );
 }
 
-function OrbGraphicSection() {
+// 점수에 따른 결과 이미지 경로 반환 (0~10: 1번, 11~20: 2번, ..., 91~100: 10번)
+function getResultImage(score: number): string {
+  const imageNumber = score <= 10 ? 1 : score >= 100 ? 10 : Math.floor(score / 10);
+
+  const images: Record<number, string> = {
+    1: 'result-image-1-knife',
+    2: 'result-image-2-deadkinght',
+    3: 'result-image-3-execution',
+    4: 'result-image-4-assassin',
+    5: 'result-image-5-priest2',
+    6: 'result-image-6-queen',
+    7: 'result-image-7-king',
+    8: 'result-image-8-priest',
+    9: 'result-image-9-angel',
+    10: 'result-image-10-wizard',
+  };
+
+  return `/images/${images[imageNumber]}.png`;
+}
+
+interface OrbGraphicSectionProps {
+  score: number;
+}
+
+function OrbGraphicSection({ score }: OrbGraphicSectionProps) {
+  const imageSrc = getResultImage(score);
+
   return (
     <div
       style={{
@@ -146,44 +172,27 @@ function OrbGraphicSection() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: '40px',
       }}
     >
-      <div
+      <img
+        src={imageSrc}
+        alt="결과 이미지"
         style={{
-          width: '160px',
-          height: '160px',
-          borderRadius: '50%',
-          backgroundColor: '#2E3341',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
+          width: '400px',
+          height: '400px',
+          objectFit: 'contain',
         }}
-      >
-        <span
-          style={{
-            fontFamily: 'Wanted Sans',
-            fontSize: '16px',
-            fontWeight: 500,
-            color: 'white',
-            opacity: 0.4,
-            textAlign: 'center',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          그래픽 (변경예정)
-        </span>
-      </div>
+      />
 
       {/* FortuneCard Shadow */}
       <div
         style={{
-          width: '132px',
+          width: '200px',
           height: '32px',
-          marginTop: '52px',
+          marginTop: '0px',
           background: gradients.cardBottomGradient01,
           borderRadius: '50%',
-          opacity: '0.2',
+          opacity: '0.05',
         }}
       />
     </div>
@@ -516,27 +525,39 @@ function ShareModal({ isOpen, onClose, onShare }: ShareModalProps) {
           <span
             style={{
               ...typography.title.h4,
-              background: gradients.textGradient01,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              color: colors.text.main,
               textAlign: 'center',
+              whiteSpace: 'pre-line',
+              marginBottom: '8px',
             }}
           >
-            테스트 공유하고
+            테스트 공유하고{'\n'}러브 미션을 받아보세요
           </span>
           <span
             style={{
-              ...typography.title.h4,
-              color: colors.neutral[30],
+              ...typography.body.body5,
+              color: colors.neutral[300],
               textAlign: 'center',
+              whiteSpace: 'pre-line',
             }}
           >
-            자세한 내용 확인해보세요!
+            러브 미션을 수행하면{'\n'}연애 성공 확률이 높아져요!
           </span>
         </>
       }
-      graphicHeight={138}
+      graphicNode={
+        <div style={{ padding: '11px 0' }}>
+          <img
+            src="/images/share-popup-banner.svg"
+            alt="공유 배너"
+            style={{
+              width: '100%',
+              height: '116px',
+              objectFit: 'cover',
+            }}
+          />
+        </div>
+      }
       buttonText="테스트 공유하기"
       onButtonClick={onShare}
       secondButtonText="테스트 결과 확인하기"
@@ -625,7 +646,7 @@ export function ResultContent({ result }: ResultContentProps) {
     >
       <div className="text-center max-w-md w-full">
         <CompatibilityScoreSection score={compatibilityScore} />
-        <OrbGraphicSection />
+        <OrbGraphicSection score={compatibilityScore} />
         <FortuneDetailSection fortuneDetail={result?.fortuneDetail} />
         <FortuneTipsSection fortuneTips={result?.fortuneTips} />
         <DangerZoneSection
