@@ -5,7 +5,7 @@ import { ResultLoading, ResultReady, ResultPreview, ResultContent, ResultError }
 import { useTestStore } from "@/store/useTestStore";
 import { isNativeApp } from "@/utils/device";
 import { postLoveTest, mapStoreToRequest, LoveTestResponse } from "@/api/loveTest";
-import { useScreenImpression } from "@/hooks/useScreenImpression";
+import { useScreenImpression, ScreenName } from "@/analytics";
 
 type ResultStep = 'loading' | 'ready' | 'preview' | 'content' | 'error';
 
@@ -32,7 +32,7 @@ export default function Result() {
   const [isMinTimeElapsed, setIsMinTimeElapsed] = useState(false);
   const hasCalledApi = useRef(false);
 
-  useScreenImpression("Result");
+  useScreenImpression(ScreenName.RESULT);
 
   useEffect(() => {
     setIsApp(isNativeApp());
