@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
+import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 import { useRouter } from "next/navigation";
 import { Header } from "@/design-system/components/Header/Header";
 import { Title } from "@/design-system/components/Title";
@@ -21,24 +22,12 @@ export default function Question4() {
   const monthRef = useRef<HTMLInputElement>(null);
   const dayRef = useRef<HTMLInputElement>(null);
   const timeRef = useRef<HTMLInputElement>(null);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const keyboardInset = useKeyboardInset();
 
   useScreenImpression(ScreenName.QUESTION_4);
 
   useEffect(() => {
     setTimeout(() => yearRef.current?.focus(), 300);
-  }, []);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const handleResize = () => {
-      setKeyboardHeight(window.innerHeight - vv.height);
-    };
-
-    vv.addEventListener("resize", handleResize);
-    return () => vv.removeEventListener("resize", handleResize);
   }, []);
 
   const isBirthValid = partnerBirth.unknownBirth || (partnerBirth.year && partnerBirth.month && partnerBirth.day);
@@ -251,7 +240,8 @@ export default function Question4() {
       <div
         className="fixed left-0 right-0"
         style={{
-          bottom: `${keyboardHeight}px`,
+          bottom: `${keyboardInset}px`,
+          paddingBottom: keyboardInset === 0 ? 'env(safe-area-inset-bottom)' : undefined,
           backgroundColor: colors.background.main,
           transition: 'bottom 0.1s ease-out',
         }}

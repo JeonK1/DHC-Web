@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState, Suspense } from "react";
+import { useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 import { Header } from "@/design-system/components/Header/Header";
 import { Title } from "@/design-system/components/Title";
 import { LabelButton } from "@/design-system/components/LabelButton";
@@ -20,21 +21,9 @@ function Question1Content() {
   const copy = QUESTION_1_COPY[questionType];
   const { userInfo, setUserInfo } = useTestStore();
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const keyboardInset = useKeyboardInset();
 
   useScreenImpression(ScreenName.QUESTION_1);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const handleResize = () => {
-      setKeyboardHeight(window.innerHeight - vv.height);
-    };
-
-    vv.addEventListener("resize", handleResize);
-    return () => vv.removeEventListener("resize", handleResize);
-  }, []);
 
   const isFormValid = userInfo.gender && userInfo.name;
 
@@ -137,7 +126,8 @@ function Question1Content() {
       <div
         className="fixed left-0 right-0"
         style={{
-          bottom: `${keyboardHeight}px`,
+          bottom: `${keyboardInset}px`,
+          paddingBottom: keyboardInset === 0 ? 'env(safe-area-inset-bottom)' : undefined,
           backgroundColor: colors.background.main,
           transition: 'bottom 0.1s ease-out',
         }}

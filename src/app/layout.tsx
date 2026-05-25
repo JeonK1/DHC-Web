@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import FirebaseAnalytics from "@/components/FirebaseAnalytics";
@@ -9,6 +9,14 @@ const SITE_URL = "https://dhc-web.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // 키보드(IME)가 올라올 때 레이아웃 뷰포트를 함께 축소시켜
+  // 하단 고정 버튼이 키보드 위에 자연스럽게 위치하도록 한다.
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({

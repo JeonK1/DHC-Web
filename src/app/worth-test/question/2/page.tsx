@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 import { Header } from "@/design-system/components/Header/Header";
 import { Title } from "@/design-system/components/Title";
 import { InputFieldGroup } from "@/design-system/components/InputFieldGroup";
@@ -36,25 +37,13 @@ function Question2Content() {
   const monthRef = useRef<HTMLInputElement>(null);
   const dayRef = useRef<HTMLInputElement>(null);
   const timeRef = useRef<HTMLInputElement>(null);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const keyboardInset = useKeyboardInset();
   const [submitting, setSubmitting] = useState(false);
 
   useScreenImpression(ScreenName.QUESTION_2);
 
   useEffect(() => {
     setTimeout(() => yearRef.current?.focus(), 300);
-  }, []);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const handleResize = () => {
-      setKeyboardHeight(window.innerHeight - vv.height);
-    };
-
-    vv.addEventListener("resize", handleResize);
-    return () => vv.removeEventListener("resize", handleResize);
   }, []);
 
   const isFormValid = userBirth.year && userBirth.month && userBirth.day && (userBirth.unknownTime || userBirth.birthTime);
@@ -200,7 +189,8 @@ function Question2Content() {
       <div
         className="fixed left-0 right-0"
         style={{
-          bottom: `${keyboardHeight}px`,
+          bottom: `${keyboardInset}px`,
+          paddingBottom: keyboardInset === 0 ? 'env(safe-area-inset-bottom)' : undefined,
           backgroundColor: colors.background.main,
           transition: 'bottom 0.1s ease-out',
         }}

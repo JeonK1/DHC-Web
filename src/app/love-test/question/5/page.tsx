@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
+import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 import { useRouter } from "next/navigation";
 import { Header } from "@/design-system/components/Header/Header";
 import { Title } from "@/design-system/components/Title";
@@ -18,24 +19,12 @@ export default function Question5() {
   const yearRef = useRef<HTMLInputElement>(null);
   const monthRef = useRef<HTMLInputElement>(null);
   const dayRef = useRef<HTMLInputElement>(null);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const keyboardInset = useKeyboardInset();
 
   useScreenImpression(ScreenName.QUESTION_5);
 
   useEffect(() => {
     setTimeout(() => yearRef.current?.focus(), 300);
-  }, []);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const handleResize = () => {
-      setKeyboardHeight(window.innerHeight - vv.height);
-    };
-
-    vv.addEventListener("resize", handleResize);
-    return () => vv.removeEventListener("resize", handleResize);
   }, []);
 
   const isFormValid = loveDate.year && loveDate.month && loveDate.day;
@@ -139,7 +128,8 @@ export default function Question5() {
       <div
         className="fixed left-0 right-0"
         style={{
-          bottom: `${keyboardHeight}px`,
+          bottom: `${keyboardInset}px`,
+          paddingBottom: keyboardInset === 0 ? 'env(safe-area-inset-bottom)' : undefined,
           backgroundColor: colors.background.main,
           transition: 'bottom 0.1s ease-out',
         }}

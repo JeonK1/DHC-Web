@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 import { Header } from "@/design-system/components/Header/Header";
 import { Title } from "@/design-system/components/Title";
 import { InputFieldGroup } from "@/design-system/components/InputFieldGroup";
@@ -21,22 +22,10 @@ export default function Question1() {
     setWorthGroup,
   } = useTestStore();
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const keyboardInset = useKeyboardInset();
   const [submitting, setSubmitting] = useState(false);
 
   useScreenImpression(ScreenName.QUESTION_1);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const handleResize = () => {
-      setKeyboardHeight(window.innerHeight - vv.height);
-    };
-
-    vv.addEventListener("resize", handleResize);
-    return () => vv.removeEventListener("resize", handleResize);
-  }, []);
 
   const isFormValid = !!groupNameInput.trim();
 
@@ -133,7 +122,8 @@ export default function Question1() {
       <div
         className="fixed left-0 right-0"
         style={{
-          bottom: `${keyboardHeight}px`,
+          bottom: `${keyboardInset}px`,
+          paddingBottom: keyboardInset === 0 ? 'env(safe-area-inset-bottom)' : undefined,
           backgroundColor: colors.background.main,
           transition: 'bottom 0.1s ease-out',
         }}
