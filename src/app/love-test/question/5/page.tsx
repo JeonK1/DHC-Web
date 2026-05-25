@@ -126,12 +126,11 @@ export default function Question5() {
 
       {/* CTA 버튼 */}
       <div
-        className="fixed left-0 right-0"
+        className="fixed left-0 right-0 bottom-0"
         style={{
-          bottom: `${keyboardInset}px`,
-          paddingBottom: keyboardInset === 0 ? 'env(safe-area-inset-bottom)' : undefined,
+          paddingBottom: keyboardInset > 0 ? `${keyboardInset}px` : 'env(safe-area-inset-bottom)',
           backgroundColor: colors.background.main,
-          transition: 'bottom 0.1s ease-out',
+          transition: 'padding-bottom 0.1s ease-out',
         }}
       >
         <div className="max-w-md w-full mx-auto">
