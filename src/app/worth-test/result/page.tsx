@@ -191,7 +191,7 @@ function LifeGraphSection({
             padding: '20px 24px',
             backgroundColor: colors.neutral[700],
             borderRadius: '12px',
-            margin: '16px 20px',
+            margin: '16px 0',
           }}
         >
           <div
@@ -496,7 +496,7 @@ function WorthTestResultContent() {
   return (
     <div
       style={{ backgroundColor: colors.background.main, minHeight: "100vh" }}
-      className="flex flex-col items-center"
+      className="flex flex-col items-center px-5"
     >
       <ScoreSection result={data.result} />
       <div style={{ height: "24px" }} />
