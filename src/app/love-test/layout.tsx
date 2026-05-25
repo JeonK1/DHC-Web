@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { OG_TITLE } from "@/constants/meta";
 
 const SITE_URL = "https://dhc-web.vercel.app";
@@ -39,6 +39,11 @@ export const metadata: Metadata = {
   },
 };
 
+// 모바일 OS/브라우저의 자동 다크모드(force-dark) 변형 차단용 color-scheme 선언
+export const viewport: Viewport = {
+  colorScheme: "light",
+};
+
 // JSON-LD 구조화 데이터
 const jsonLd = {
   "@context": "https://schema.org",
@@ -66,12 +71,12 @@ export default function LoveTestLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <div style={{ colorScheme: "light" }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {children}
-    </>
+    </div>
   );
 }
