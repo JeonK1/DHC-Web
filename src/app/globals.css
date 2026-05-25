@@ -44,4 +44,15 @@ body {
     white-space: nowrap;
     border-width: 0;
   }
+
+  /* worth-test 경로: 모바일 웹 스크롤바 숨김 (스크롤 기능은 유지) */
+  .worth-test-hide-scrollbar,
+  .worth-test-hide-scrollbar * {
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* IE/Edge */
+  }
+  .worth-test-hide-scrollbar::-webkit-scrollbar,
+  .worth-test-hide-scrollbar *::-webkit-scrollbar {
+    display: none;                /* Chrome / Safari / WebKit */
+  }
 }
