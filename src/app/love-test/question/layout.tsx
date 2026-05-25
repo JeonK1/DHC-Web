@@ -4,7 +4,10 @@ export default function QuestionLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: "var(--background-main)" }}
+    >
       {children}
     </div>
   );
